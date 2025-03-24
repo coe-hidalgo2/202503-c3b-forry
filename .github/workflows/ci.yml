@@ -1,0 +1,26 @@
+
+name: CI - Configure, Build, Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+ 
+
+jobs:
+  build-test:
+    runs-on: self-ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Configure the Build System
+        run: |
+          cmake --preset default
+      - name: Build the Project
+        run: |
+          cmake --build --preset
+      - name: Run Tests
+        run: |
+          ctest --preset default
