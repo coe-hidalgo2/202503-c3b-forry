@@ -20,7 +20,7 @@ jobs:
           cmake --preset default
       - name: Build the Project
         run: |
-          cmake --build --preset
+          cmake --build --preset default
       - name: Run Tests
         run: |
           ctest --preset default
