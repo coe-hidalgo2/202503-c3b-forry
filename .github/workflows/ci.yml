@@ -51,4 +51,4 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: ghcr.io/${{ github.actor }}/c3b:v1
+          tags: ghcr.io/${{ github.repository }}:v1
