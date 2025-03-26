@@ -1,36 +1,47 @@
 {
-    "version": 3,
-    "cmakeMinimumRequired": {
-      "major": 3,
-      "minor": 22,
-      "patch": 0
-    },
-    "configurePresets": [
-      {
-        "name": "default",
-        "displayName": "Default Configuration",
-        "description": "Configure with Ninja generator and C++20 standard",
-        "generator": "Ninja",
-        "binaryDir": "${sourceDir}/build/default",
-        "cacheVariables": {
-          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
-          "CMAKE_CXX_STANDARD": "20"
-        }
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Configuration",
+      "description": "Configure with Ninja generator and C++20 standard",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/default",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "YES",
+        "CMAKE_CXX_STANDARD": "20"
       }
-    ],
-    "buildPresets": [
-      {
-        "name": "default",
-        "configurePreset": "default",
-        "description": "Build the project using the default configuration",
-        "jobs": 4
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "description": "Build the project using the default configuration",
+      "jobs": 4
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": {
+          "outputOnFailure": true
+      },
+      "execution": {
+          "jobs":1,
+          "noTestsAction": "error",
+          "stopOnFailure": false,
+          "repeat": {
+              "mode": "until-pass",
+              "count": 3
+          }
       }
-    ],
-    "testPresets": [
-      {
-        "name": "default",
-        "configurePreset": "default",
-        "description": "Run the tests using the default configuration"
-      }
-    ]
-  }
+    }
+  ]
+}
