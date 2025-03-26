@@ -1,0 +1,56 @@
+name: Deploy
+run-name: "Deploy [${{ inputs.image }} - ${{ inputs.np }}]"
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: 'Image to deploy'
+        required: true
+        default: 'ghcr.io/coe-hidalgo2/202503-c3b-prudhomm:main-sif'
+      np: 
+        description: 'Number of processes'
+        required: true
+        default: 4
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        runs-on: [self-ubuntu-24.04, karolina]
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create sif filename
+        run: |
+          sif=$(basename "${{ github.repository }}.sif")
+          echo "SIF_FILENAME=$sif" >> $GITHUB_ENV
+
+      - name: Set APPTAINER_CMD
+        run: |
+          if [ "${{ matrix.runs-on }}" == "karolina" ]; then
+            apptainer_cmd=apptainer
+          else 
+            apptainer_cmd=/opt/apptainer/v1.4.0/apptainer/bin/apptainer
+          fi  
+          echo "Using apptainer command: $apptainer_cmd"
+          # Save the command in the environment for subsequent steps
+          echo "APPTAINER_CMD=$apptainer_cmd" >> $GITHUB_ENV
+
+      - name: PULL Apptainer SIF
+        run: |
+          # Pull the SIF file from GHCR
+          $APPTAINER_CMD pull -F $SIF_FILENAME oras://${{ inputs.image }}
+          # inspect the SIF file
+          $APPTAINER_CMD inspect $SIF_FILENAME
+
+      - name: Run Container on self-ubuntu-24.04
+        if: matrix.runs-on == 'self-ubuntu-24.04'
+        run: |
+          # Run the SIF using the stored APPTAINER_CMD command and mpirun
+          mpirun -np 4 $APPTAINER_CMD run --sharens $SIF_FILENAME myapp
+
+      - name: Run Container on Karolina
+        if: matrix.runs-on == 'karolina'
+        run: |
+          bash job_monitor.sh $SIF_FILENAME ${{ inputs.np }}
